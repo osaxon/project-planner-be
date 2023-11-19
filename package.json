@@ -6,7 +6,11 @@
     "scripts": {
         "test": "jest",
         "test-seed": "jest seed.test.js",
-        "setup-dbs": "psql -f src/db/setup.sql"
+        "test-utils": "jest utils.test.js",
+        "seed": "node src/db/run-seed.js",
+        "setup-dbs": "psql -f src/db/setup.sql",
+        "check-testdb-projects": "psql -d project_planner_test -c 'SELECT * FROM projects;'",
+        "check-db-projects": "psql -d project_planner -c 'SELECT * FROM projects;'"
     },
     "keywords": [],
     "author": "",
@@ -19,6 +23,7 @@
     "dependencies": {
         "dotenv": "^16.3.1",
         "express": "^4.18.2",
-        "pg": "^8.11.3"
+        "pg": "^8.11.3",
+        "pg-format": "^1.0.4"
     }
 }

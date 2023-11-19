@@ -1,4 +1,6 @@
 const db = require("./");
+const format = require("pg-format");
+const { formatData } = require("../utils");
 
 const seed = async ({ projects, tasks, categories, users }) => {
     try {
@@ -11,7 +13,10 @@ const seed = async ({ projects, tasks, categories, users }) => {
         await createProjectsTable();
         await createCategoriesTable();
         await createTasksTable();
-        console.log("Tables created 😎");
+        const { rows: insertedProjects, rowCount } = await insertProjects(
+            projects
+        );
+        console.log(insertedProjects, "<--- the new projects");
     } catch (error) {
         console.error(error);
         throw new Error(error);
@@ -32,6 +37,7 @@ async function createProjectsTable() {
         await db.query(`CREATE TABLE projects (
                 project_id SERIAL PRIMARY KEY,
                 project_name VARCHAR(50) NOT NULL,
+                description VARCHAR(200),
                 start_date DATE NOT NULL
             );`);
     } catch (error) {
@@ -87,4 +93,17 @@ async function createTasksTable() {
     }
 }
 
+async function insertProjects(projects) {
+    const formattedProjects = formatData(projects);
+    try {
+        const query = format(
+            `INSERT INTO projects (project_name, description, start_date) VALUES %L RETURNING *;`,
+            formattedProjects
+        );
+        return await db.query(query);
+    } catch (error) {
+        console.error(error);
+        throw new Error(error);
+    }
+}
 module.exports = seed;
